@@ -1,54 +1,32 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Espetinho do Chefe - Cardápio</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 text-gray-800 pb-10">
+async function carregarCardapio() {
+  try {
+    const res = await fetch('/api/espetinhos');
+    const itens = await res.json();
+    const container = document.getElementById('cardapio');
+    container.innerHTML = '';
 
-  <!-- Cabeçalho -->
-  <header class="bg-red-700 text-white text-center py-6 shadow-md mb-6">
-    <h1 class="text-3xl font-bold">🍡 Espetinho do Chefe</h1>
-    <p class="text-sm mt-1 opacity-90">O melhor espetinho da cidade!</p>
-  </header>
-
-  <!-- Container do Cardápio -->
-  <main class="max-w-md mx-auto px-4">
-    <div id="cardapio" class="space-y-4">
-      <p class="text-center text-gray-500">Carregando cardápio...</p>
-    </div>
-  </main>
-
-  <script>
-    async function carregarCardapio() {
-      try {
-        const res = await fetch('./menu.json');
-        const itens = await res.json();
-        const container = document.getElementById('cardapio');
-        container.innerHTML = '';
-
-        itens.forEach(item => {
-          container.innerHTML += `
-            <div class="bg-white rounded-lg shadow-sm overflow-hidden flex border border-gray-200">
-              <img src="${item.imagem}" alt="${item.nome}" class="w-28 h-28 object-cover flex-shrink-0">
-              <div class="p-3 flex flex-col justify-between flex-1">
-                <div>
-                  <h2 class="font-bold text-gray-900">${item.nome}</h2>
-                  <p class="text-xs text-gray-600 mt-1">${item.descricao}</p>
-                </div>
-                <p class="text-red-700 font-bold text-base mt-2">R$ ${parseFloat(item.preco).toFixed(2).replace('.', ',')}</p>
-              </div>
-            </div>
-          `;
-        });
-      } catch (err) {
-        document.getElementById('cardapio').innerHTML = '<p class="text-center text-red-500">Erro ao carregar os itens.</p>';
-      }
+    if (itens.length === 0) {
+      container.innerHTML = '<p class="text-center text-gray-500">Nenhum espetinho cadastrado.</p>';
+      return;
     }
 
-    carregarCardapio();
-  </script>
-</body>
-</html>
+    itens.forEach(item => {
+      container.innerHTML += `
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden flex border border-gray-200">
+          <img src="${item.imagem}" alt="${item.nome}" class="w-28 h-28 object-cover flex-shrink-0">
+          <div class="p-3 flex flex-col justify-between flex-1">
+            <div>
+              <h2 class="font-bold text-gray-900">${item.nome}</h2>
+              <p class="text-xs text-gray-600 mt-1">${item.descricao}</p>
+            </div>
+            <p class="text-red-700 font-bold text-base mt-2">R$ ${parseFloat(item.preco).toFixed(2).replace('.', ',')}</p>
+          </div>
+        </div>
+      `;
+    });
+  } catch (err) {
+    document.getElementById('cardapio').innerHTML = '<p class="text-center text-red-500">Erro ao carregar dados da API.</p>';
+  }
+}
+
+carregarCardapio();
